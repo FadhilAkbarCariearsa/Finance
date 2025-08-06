@@ -5,12 +5,83 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pengelolaan Keuangan Fadhil</title>
   <style>
-    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-    h1 { text-align: center; }
-    input, select, button { margin: 5px 0; padding: 10px; width: 100%; }
-    .entry { border-bottom: 1px solid #ccc; padding: 10px 0; }
-    .income { color: green; }
-    .expense { color: red; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      color: #333;
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    form {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    input, select, button {
+      margin: 10px 0;
+      padding: 12px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #2ecc71;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #27ae60;
+    }
+
+    #history {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .entry {
+      border-bottom: 1px solid #eee;
+      padding: 12px 0;
+    }
+
+    .entry:last-child {
+      border-bottom: none;
+    }
+
+    .income { color: #27ae60; }
+    .expense { color: #e74c3c; }
+
+    .entry button {
+      margin-top: 5px;
+      background-color: #e74c3c;
+      color: white;
+      font-size: 14px;
+    }
+
+    .entry button:hover {
+      background-color: #c0392b;
+    }
+
+    .no-data {
+      text-align: center;
+      color: #888;
+    }
   </style>
 </head>
 <body>
@@ -24,7 +95,7 @@
       <option value="expense">Pengeluaran</option>
     </select>
     <input type="date" id="date" required />
-    <button type="submit">Simpan Data</button>
+    <button type="submit">➕ Simpan Data</button>
   </form>
 
   <h2>📅 Riwayat Transaksi</h2>
@@ -33,22 +104,43 @@
   <script>
     const form = document.getElementById('financeForm');
     const historyDiv = document.getElementById('history');
-
     let data = JSON.parse(localStorage.getItem('financeData')) || [];
 
     function updateDisplay() {
       historyDiv.innerHTML = '';
+      if (data.length === 0) {
+        historyDiv.innerHTML = '<p class="no-data">Belum ada transaksi disimpan.</p>';
+        return;
+      }
+
       data.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = `entry ${item.type}`;
         div.innerHTML = `
-          <strong>${item.description}</strong> - Rp${item.amount.toLocaleString()} 
-          (${item.type === 'income' ? 'Masuk' : 'Keluar'}) 
-          <br/><small>${item.date}</small>
-          <button onclick="deleteEntry(${index})">Hapus</button>
+          <strong>${item.description}</strong><br/>
+          Rp${item.amount.toLocaleString()} 
+          <span>(${item.type === 'income' ? 'Masuk' : 'Keluar'})</span><br/>
+          <small>${item.date}</small><br/>
+          <button onclick="confirmDelete(${index})">🗑️ Hapus</button>
         `;
         historyDiv.appendChild(div);
       });
+    }
+
+    function confirmDelete(index) {
+      const entry = data[index];
+      const confirmDelete = confirm(
+        `Yakin ingin menghapus:\n"${entry.description}" sebesar Rp${entry.amount.toLocaleString()} (${entry.type})?`
+      );
+      if (confirmDelete) {
+        deleteEntry(index);
+      }
+    }
+
+    function deleteEntry(index) {
+      data.splice(index, 1);
+      localStorage.setItem('financeData', JSON.stringify(data));
+      updateDisplay();
     }
 
     form.addEventListener('submit', (e) => {
@@ -64,13 +156,6 @@
       updateDisplay();
     });
 
-    function deleteEntry(index) {
-      data.splice(index, 1);
-      localStorage.setItem('financeData', JSON.stringify(data));
-      updateDisplay();
-    }
-
-    // Tampilkan data saat pertama kali dibuka
     updateDisplay();
   </script>
 </body>
