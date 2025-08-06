@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pengelolaan Keuangan Fadhil</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+    h1 { text-align: center; }
+    input, select, button { margin: 5px 0; padding: 10px; width: 100%; }
+    .entry { border-bottom: 1px solid #ccc; padding: 10px 0; }
+    .income { color: green; }
+    .expense { color: red; }
+  </style>
+</head>
+<body>
+  <h1>📊 Keuangan Harian Fadhil</h1>
+
+  <form id="financeForm">
+    <input type="text" id="description" placeholder="Deskripsi (contoh: jajan, tabungan)" required />
+    <input type="number" id="amount" placeholder="Jumlah uang (contoh: 5000)" required />
+    <select id="type">
+      <option value="income">Pemasukan</option>
+      <option value="expense">Pengeluaran</option>
+    </select>
+    <input type="date" id="date" required />
+    <button type="submit">Simpan Data</button>
+  </form>
+
+  <h2>📅 Riwayat Transaksi</h2>
+  <div id="history"></div>
+
+  <script>
+    const form = document.getElementById('financeForm');
+    const historyDiv = document.getElementById('history');
+
+    let data = JSON.parse(localStorage.getItem('financeData')) || [];
+
+    function updateDisplay() {
+      historyDiv.innerHTML = '';
+      data.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = `entry ${item.type}`;
+        div.innerHTML = `
+          <strong>${item.description}</strong> - Rp${item.amount.toLocaleString()} 
+          (${item.type === 'income' ? 'Masuk' : 'Keluar'}) 
+          <br/><small>${item.date}</small>
+          <button onclick="deleteEntry(${index})">Hapus</button>
+        `;
+        historyDiv.appendChild(div);
+      });
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const description = document.getElementById('description').value;
+      const amount = parseInt(document.getElementById('amount').value);
+      const type = document.getElementById('type').value;
+      const date = document.getElementById('date').value;
+
+      data.push({ description, amount, type, date });
+      localStorage.setItem('financeData', JSON.stringify(data));
+      form.reset();
+      updateDisplay();
+    });
+
+    function deleteEntry(index) {
+      data.splice(index, 1);
+      localStorage.setItem('financeData', JSON.stringify(data));
+      updateDisplay();
+    }
+
+    // Tampilkan data saat pertama kali dibuka
+    updateDisplay();
+  </script>
+</body>
+</html>
