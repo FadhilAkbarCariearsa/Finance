@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pengelolaan Keuangan Fadhil</title>
+  <title>Fadhil's Finance Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     * {
       margin: 0;
@@ -12,48 +13,52 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #e0eafc, #cfdef3);
-      color: #1a1a1a;
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+      color: #1f2937;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      padding: 0 1rem;
+      flex-grow: 1;
     }
 
     h1 {
+      font-size: clamp(1.8rem, 5vw, 2.2rem);
+      color: #1e3a8a;
       text-align: center;
-      color: #2b2d42;
-      font-size: 2.2em;
-      margin-bottom: 20px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin: 1.5rem 0;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    h2 {
-      color: #2b2d42;
-      font-size: 1.5em;
-      margin: 20px 0;
-      text-align: center;
+    .form-container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(8px);
     }
 
-    form {
-      background: #fff;
-      padding: 25px;
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-      margin-bottom: 30px;
-      backdrop-filter: blur(10px);
+    .input-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
     }
 
-    input, select, button {
-      margin: 10px 0;
-      padding: 12px;
-      width: 100%;
+    input, select {
+      padding: 0.75rem;
       border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 1em;
+      border-radius: 0.5rem;
+      font-size: 0.95rem;
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
@@ -66,9 +71,12 @@
     button {
       background: linear-gradient(90deg, #3b82f6, #60a5fa);
       color: white;
-      font-weight: 600;
-      cursor: pointer;
+      font-weight: 500;
       border: none;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 1rem;
       transition: transform 0.2s ease, background 0.3s ease;
     }
 
@@ -77,11 +85,26 @@
       transform: translateY(-2px);
     }
 
-    #history {
-      background: #fff;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    .summary {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 1rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .summary span {
+      margin: 0 0.75rem;
+      font-weight: 500;
+    }
+
+    .history {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       flex-grow: 1;
     }
 
@@ -89,7 +112,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 15px;
+      padding: 0.75rem;
       border-bottom: 1px solid #f1f5f9;
       transition: background 0.2s ease;
     }
@@ -108,10 +131,10 @@
     .entry button {
       background: #ef4444;
       color: white;
-      font-size: 0.9em;
-      padding: 8px 12px;
+      font-size: 0.85rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.4rem;
       width: auto;
-      border-radius: 6px;
     }
 
     .entry button:hover {
@@ -123,49 +146,61 @@
       text-align: center;
       color: #6b7280;
       font-style: italic;
+      padding: 1rem;
     }
 
     footer {
       text-align: center;
       color: #4b5563;
-      font-size: 0.9em;
-      margin-top: 20px;
-      padding-top: 20px;
+      font-size: 0.85rem;
+      margin: 1.5rem 0 1rem;
+      padding-top: 1rem;
       border-top: 1px solid #e5e7eb;
+      width: 100%;
     }
 
-    .summary {
-      background: #fff;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
+    @media (max-width: 600px) {
+      .input-group {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
 
-    .summary span {
-      font-weight: 600;
-      margin: 0 10px;
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      .form-container, .summary, .history {
+        padding: 1rem;
+      }
+
+      button {
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>📊 Keuangan Harian Fadhil</h1>
+  <div class="container">
+    <h1>📊 Fadhil's Finance Tracker</h1>
 
-  <form id="financeForm">
-    <input type="text" id="description" placeholder="Deskripsi (contoh: Makan, Tabungan)" required />
-    <input type="number" id="amount" placeholder="Jumlah (contoh: 50000)" min="0" required />
-    <select id="type">
-      <option value="income">Pemasukan</option>
-      <option value="expense">Pengeluaran</option>
-    </select>
-    <input type="date" id="date" required />
-    <button type="submit">➕ Tambah Transaksi</button>
-  </form>
+    <div class="form-container">
+      <form id="financeForm">
+        <div class="input-group">
+          <input type="text" id="description" placeholder="Description (e.g., Food, Savings)" required />
+          <input type="number" id="amount" placeholder="Amount (e.g., 50000)" min="0" step="1" required />
+          <select id="type">
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+          <input type="date" id="date" required />
+        </div>
+        <button type="submit">➕ Add Transaction</button>
+      </form>
+    </div>
 
-  <div class="summary" id="summary"></div>
-  <h2>📅 Riwayat Transaksi</h2>
-  <div id="history"></div>
+    <div class="summary" id="summary"></div>
+    <div class="history" id="history"></div>
+  </div>
 
   <footer>© 2025 Fadhil Akbar Cariearsa. All Rights Reserved.</footer>
 
@@ -176,7 +211,7 @@
     let data = JSON.parse(localStorage.getItem('financeData')) || [];
 
     function formatCurrency(amount) {
-      return `Rp${amount.toLocaleString('id-ID')}`;
+      return `IDR ${amount.toLocaleString('id-ID')}`;
     }
 
     function updateSummary() {
@@ -189,20 +224,20 @@
       const balance = totalIncome - totalExpense;
 
       summaryDiv.innerHTML = `
-        <span class="income">Pemasukan: ${formatCurrency(totalIncome)}</span>
-        <span class="expense">Pengeluaran: ${formatCurrency(totalExpense)}</span>
-        <span>Saldo: ${formatCurrency(balance)}</span>
+        <span class="income">Income: ${formatCurrency(totalIncome)}</span>
+        <span class="expense">Expense: ${formatCurrency(totalExpense)}</span>
+        <span>Balance: ${formatCurrency(balance)}</span>
       `;
     }
 
     function updateDisplay() {
       historyDiv.innerHTML = '';
       if (data.length === 0) {
-        historyDiv.innerHTML = '<p class="no-data">Belum ada transaksi.</p>';
+        historyDiv.innerHTML = '<p class="no-data">No transactions yet.</p>';
         return;
       }
 
-      data.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date (newest first)
+      data.sort((a, b) => new Date(b.date) - new Date(a.date));
       data.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = `entry ${item.type}`;
@@ -210,10 +245,10 @@
           <div>
             <strong>${item.description}</strong><br/>
             ${formatCurrency(item.amount)} 
-            <span>(${item.type === 'income' ? 'Masuk' : 'Keluar'})</span><br/>
-            <small>${new Date(item.date).toLocaleDateString('id-ID')}</small>
+            <span>(${item.type === 'income' ? 'Income' : 'Expense'})</span><br/>
+            <small>${new Date(item.date).toLocaleDateString('en-GB')}</small>
           </div>
-          <button onclick="confirmDelete(${index})">🗑️ Hapus</button>
+          <button onclick="confirmDelete(${index})">🗑️ Delete</button>
         `;
         historyDiv.appendChild(div);
       });
@@ -222,7 +257,7 @@
 
     function confirmDelete(index) {
       const entry = data[index];
-      if (confirm(`Hapus "${entry.description}" sebesar ${formatCurrency(entry.amount)} (${entry.type})?`)) {
+      if (confirm(`Delete "${entry.description}" of ${formatCurrency(entry.amount)} (${entry.type})?`)) {
         data.splice(index, 1);
         localStorage.setItem('financeData', JSON.stringify(data));
         updateDisplay();
@@ -237,7 +272,7 @@
       const date = document.getElementById('date').value;
 
       if (!description || isNaN(amount) || amount < 0 || !date) {
-        alert('Harap isi semua field dengan benar!');
+        alert('Please fill all fields correctly!');
         return;
       }
 
