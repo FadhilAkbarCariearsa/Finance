@@ -2,85 +2,150 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pengelolaan Keuangan Fadhil</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f8;
-      color: #333;
-      max-width: 700px;
-      margin: auto;
-      padding: 20px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    h1, h2 {
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      color: #1a1a1a;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 {
       text-align: center;
-      color: #2c3e50;
+      color: #2b2d42;
+      font-size: 2.2em;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #2b2d42;
+      font-size: 1.5em;
+      margin: 20px 0;
+      text-align: center;
     }
 
     form {
       background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
       margin-bottom: 30px;
+      backdrop-filter: blur(10px);
     }
 
     input, select, button {
       margin: 10px 0;
       padding: 12px;
       width: 100%;
-      border: 1px solid #ccc;
+      border: 1px solid #d1d5db;
       border-radius: 8px;
-      font-size: 16px;
+      font-size: 1em;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
     button {
-      background-color: #2ecc71;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
       color: white;
-      font-weight: bold;
+      font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      border: none;
+      transition: transform 0.2s ease, background 0.3s ease;
     }
 
     button:hover {
-      background-color: #27ae60;
+      background: linear-gradient(90deg, #2563eb, #3b82f6);
+      transform: translateY(-2px);
     }
 
     #history {
       background: #fff;
-      border-radius: 12px;
+      border-radius: 16px;
       padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      flex-grow: 1;
     }
 
     .entry {
-      border-bottom: 1px solid #eee;
-      padding: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.2s ease;
+    }
+
+    .entry:hover {
+      background: #f8fafc;
     }
 
     .entry:last-child {
       border-bottom: none;
     }
 
-    .income { color: #27ae60; }
-    .expense { color: #e74c3c; }
+    .income { color: #16a34a; }
+    .expense { color: #dc2626; }
 
     .entry button {
-      margin-top: 5px;
-      background-color: #e74c3c;
+      background: #ef4444;
       color: white;
-      font-size: 14px;
+      font-size: 0.9em;
+      padding: 8px 12px;
+      width: auto;
+      border-radius: 6px;
     }
 
     .entry button:hover {
-      background-color: #c0392b;
+      background: #b91c1c;
+      transform: translateY(0);
     }
 
     .no-data {
       text-align: center;
-      color: #888;
+      color: #6b7280;
+      font-style: italic;
+    }
+
+    footer {
+      text-align: center;
+      color: #4b5563;
+      font-size: 0.9em;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .summary {
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .summary span {
+      font-weight: 600;
+      margin: 0 10px;
     }
   </style>
 </head>
@@ -88,67 +153,93 @@
   <h1>📊 Keuangan Harian Fadhil</h1>
 
   <form id="financeForm">
-    <input type="text" id="description" placeholder="Deskripsi (contoh: jajan, tabungan)" required />
-    <input type="number" id="amount" placeholder="Jumlah uang (contoh: 5000)" required />
+    <input type="text" id="description" placeholder="Deskripsi (contoh: Makan, Tabungan)" required />
+    <input type="number" id="amount" placeholder="Jumlah (contoh: 50000)" min="0" required />
     <select id="type">
       <option value="income">Pemasukan</option>
       <option value="expense">Pengeluaran</option>
     </select>
     <input type="date" id="date" required />
-    <button type="submit">➕ Simpan Data</button>
+    <button type="submit">➕ Tambah Transaksi</button>
   </form>
 
+  <div class="summary" id="summary"></div>
   <h2>📅 Riwayat Transaksi</h2>
   <div id="history"></div>
+
+  <footer>© 2025 Fadhil Akbar Cariearsa. All Rights Reserved.</footer>
 
   <script>
     const form = document.getElementById('financeForm');
     const historyDiv = document.getElementById('history');
+    const summaryDiv = document.getElementById('summary');
     let data = JSON.parse(localStorage.getItem('financeData')) || [];
+
+    function formatCurrency(amount) {
+      return `Rp${amount.toLocaleString('id-ID')}`;
+    }
+
+    function updateSummary() {
+      const totalIncome = data
+        .filter(item => item.type === 'income')
+        .reduce((sum, item) => sum + item.amount, 0);
+      const totalExpense = data
+        .filter(item => item.type === 'expense')
+        .reduce((sum, item) => sum + item.amount, 0);
+      const balance = totalIncome - totalExpense;
+
+      summaryDiv.innerHTML = `
+        <span class="income">Pemasukan: ${formatCurrency(totalIncome)}</span>
+        <span class="expense">Pengeluaran: ${formatCurrency(totalExpense)}</span>
+        <span>Saldo: ${formatCurrency(balance)}</span>
+      `;
+    }
 
     function updateDisplay() {
       historyDiv.innerHTML = '';
       if (data.length === 0) {
-        historyDiv.innerHTML = '<p class="no-data">Belum ada transaksi disimpan.</p>';
+        historyDiv.innerHTML = '<p class="no-data">Belum ada transaksi.</p>';
         return;
       }
 
+      data.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date (newest first)
       data.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = `entry ${item.type}`;
         div.innerHTML = `
-          <strong>${item.description}</strong><br/>
-          Rp${item.amount.toLocaleString()} 
-          <span>(${item.type === 'income' ? 'Masuk' : 'Keluar'})</span><br/>
-          <small>${item.date}</small><br/>
+          <div>
+            <strong>${item.description}</strong><br/>
+            ${formatCurrency(item.amount)} 
+            <span>(${item.type === 'income' ? 'Masuk' : 'Keluar'})</span><br/>
+            <small>${new Date(item.date).toLocaleDateString('id-ID')}</small>
+          </div>
           <button onclick="confirmDelete(${index})">🗑️ Hapus</button>
         `;
         historyDiv.appendChild(div);
       });
+      updateSummary();
     }
 
     function confirmDelete(index) {
       const entry = data[index];
-      const confirmDelete = confirm(
-        `Yakin ingin menghapus:\n"${entry.description}" sebesar Rp${entry.amount.toLocaleString()} (${entry.type})?`
-      );
-      if (confirmDelete) {
-        deleteEntry(index);
+      if (confirm(`Hapus "${entry.description}" sebesar ${formatCurrency(entry.amount)} (${entry.type})?`)) {
+        data.splice(index, 1);
+        localStorage.setItem('financeData', JSON.stringify(data));
+        updateDisplay();
       }
-    }
-
-    function deleteEntry(index) {
-      data.splice(index, 1);
-      localStorage.setItem('financeData', JSON.stringify(data));
-      updateDisplay();
     }
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const description = document.getElementById('description').value;
+      const description = document.getElementById('description').value.trim();
       const amount = parseInt(document.getElementById('amount').value);
       const type = document.getElementById('type').value;
       const date = document.getElementById('date').value;
+
+      if (!description || isNaN(amount) || amount < 0 || !date) {
+        alert('Harap isi semua field dengan benar!');
+        return;
+      }
 
       data.push({ description, amount, type, date });
       localStorage.setItem('financeData', JSON.stringify(data));
