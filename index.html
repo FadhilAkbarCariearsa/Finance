@@ -4,285 +4,463 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Finance Tracker</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --primary: #0d6efd;
+      --accent: #18ffe6;
+      --bg-gradient: linear-gradient(135deg, #1a2138 0%, #232526 100%);
+      --glass: rgba(255,255,255,0.07);
+      --glass-strong: rgba(255,255,255,0.16);
+      --card-radius: 1rem;
+      --shadow-main: 0 8px 32px 0 rgba(0,0,0,0.18);
+      --income: #03dac6;
+      --expense: #ff1744;
+      --balance: #ffca28;
+      --border: #23283a;
+      --text-main: #f7fafd;
+      --text-sub: #b3b9c9;
+      --blur: blur(12px);
     }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100%;
+      width: 100%;
+      font-family: 'Inter', Arial, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      scroll-behavior: smooth;
+      -webkit-tap-highlight-color: transparent;
+    }
     body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-      color: #1f2937;
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 1rem;
+      min-height: 100vh;
     }
-
     .container {
-      max-width: 900px;
       width: 100%;
-      padding: 0 1rem;
-      flex-grow: 1;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      padding: 0.7rem 0.2rem 0 0.2rem;
+      min-height: 100vh;
+      max-width: 440px;
+      transition: max-width 0.2s;
+    }
+    @media (max-width: 599px) {
+      .container { max-width: 100vw; }
+    }
+    @media (min-width: 600px) and (max-width: 1024px) {
+      .container { max-width: 80vw; }
+    }
+    @media (min-width: 1025px) {
+      .container { max-width: 480px; }
     }
 
     h1 {
-      font-size: clamp(1.8rem, 5vw, 2.2rem);
-      color: #1e3a8a;
+      font-size: clamp(1.1rem, 4vw, 2rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin: 2.2rem 0 1.2rem 0;
       text-align: center;
-      margin: 1.5rem 0;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-fill-color: transparent;
+      text-shadow: 0 3px 18px #00e1ff33;
+      user-select: none;
     }
-
     .form-container {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      margin-bottom: 1.5rem;
-      backdrop-filter: blur(8px);
+      background: var(--glass);
+      border: 1.5px solid var(--glass-strong);
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow-main);
+      padding: 1.1rem 1.1rem 0.6rem 1.1rem;
+      margin-bottom: 1.3rem;
+      backdrop-filter: var(--blur);
+      transition: border 0.18s;
     }
-
-    .input-group {
+    .input-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1rem;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
     }
-
+    .input-row:last-child { grid-template-columns: 1fr 1fr; }
     input, select {
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.5rem;
-      font-size: 0.95rem;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    button {
-      background: linear-gradient(90deg, #3b82f6, #60a5fa);
-      color: white;
-      font-weight: 500;
-      border: none;
-      padding: 0.75rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
+      width: 100%;
+      padding: 0.65rem 0.8rem;
+      border: 1px solid var(--glass-strong);
+      border-radius: 0.45rem;
       font-size: 1rem;
-      transition: transform 0.2s ease, background 0.3s ease;
+      color: var(--text-main);
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(2px);
+      font-family: inherit;
+      transition: border-color 0.17s, box-shadow 0.17s, background 0.18s;
     }
-
-    button:hover {
-      background: linear-gradient(90deg, #2563eb, #3b82f6);
-      transform: translateY(-2px);
+    input:focus, select:focus {
+      border-color: var(--accent);
+      background: rgba(24,255,230,0.10);
+      outline: none;
+      box-shadow: 0 0 0 2px #18ffe644;
     }
-
-    .summary {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 1rem;
-      border-radius: 0.75rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      margin-bottom: 1.5rem;
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    button[type="submit"] {
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      padding: 0.7rem 0;
+      border-radius: 0.6rem;
+      cursor: pointer;
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      margin-top: 0.3rem;
+      width: 100%;
+      box-shadow: 0 2px 16px 0 #031b2740;
+      transition: background 0.19s, transform 0.13s, box-shadow 0.15s;
+      outline: none;
+    }
+    button[type="submit"]:hover, button[type="submit"]:focus {
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      transform: translateY(-1px) scale(1.01);
+      box-shadow: 0 7px 24px 0 #00e1ff33;
+    }
+    .error-message {
+      color: var(--expense);
+      background: rgba(255,23,68,0.13);
+      border-radius: 0.4rem;
       text-align: center;
-      font-size: 0.9rem;
+      font-size: 0.95em;
+      margin-bottom: 0.7rem;
+      padding: 0.38rem 0.3rem 0.32rem 0.3rem;
+      letter-spacing: 0.01em;
+      display: none;
+      user-select: none;
     }
-
-    .summary span {
-      margin: 0 0.75rem;
-      font-weight: 500;
+    .summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--glass);
+      border: 1.3px solid var(--glass-strong);
+      padding: 0.83rem 0.7rem 0.61rem 0.7rem;
+      border-radius: 0.85rem;
+      box-shadow: 0 3px 20px 0 #00e1ff22;
+      margin-bottom: 1.1rem;
+      font-size: 1.04rem;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      backdrop-filter: var(--blur);
+      user-select: none;
     }
-
+    .summary span { font-weight: 600; }
+    .income { color: var(--income); }
+    .expense { color: var(--expense); }
+    .balance {
+      color: var(--balance);
+      text-shadow: 0 2px 12px #ffca2822;
+    }
     .history {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 0.75rem;
-      padding: 1rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      flex-grow: 1;
+      background: var(--glass);
+      border: 1.3px solid var(--glass-strong);
+      padding: 0.5rem 0.2rem 0.2rem 0.2rem;
+      border-radius: 0.8rem;
+      box-shadow: var(--shadow-main);
+      min-height: 70px;
+      margin-bottom: 0.7rem;
+      backdrop-filter: var(--blur);
+      transition: background 0.14s;
     }
-
+    .log-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.05em;
+    }
     .entry {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.75rem;
-      border-bottom: 1px solid #f1f5f9;
-      transition: background 0.2s ease;
+      padding: 0.56rem 0.12rem 0.52rem 0.18rem;
+      border-bottom: 1px solid #23283a;
+      font-size: 1.02rem;
+      min-height: 38px;
+      border-radius: 0.33rem;
+      position: relative;
+      gap: 0.2rem;
+      background: none;
+      transition: background 0.18s;
     }
-
-    .entry:hover {
-      background: #f8fafc;
+    .entry:last-child { border-bottom: none; }
+    .entry:hover, .entry:focus-within {
+      background: rgba(24,255,230,0.08);
     }
-
-    .entry:last-child {
-      border-bottom: none;
+    .entry .desc {
+      display: flex;
+      flex-direction: column;
+      gap: 0.10rem;
     }
-
-    .income { color: #16a34a; }
-    .expense { color: #dc2626; }
-
+    .entry strong {
+      font-size: 1.06em;
+      font-weight: 600;
+    }
+    .entry small {
+      font-size: 0.85em;
+      color: var(--text-sub);
+      letter-spacing: 0.03em;
+    }
+    .entry .amt {
+      font-weight: 700;
+      white-space: nowrap;
+      font-size: 0.98em;
+      margin-right: 0.5rem;
+    }
+    .entry.income .amt { color: var(--income); }
+    .entry.expense .amt { color: var(--expense); }
     .entry button {
-      background: #ef4444;
-      color: white;
-      font-size: 0.85rem;
-      padding: 0.5rem 0.75rem;
-      border-radius: 0.4rem;
-      width: auto;
+      background: rgba(255,23,68,0.93);
+      color: #fff;
+      font-size: 1.1em;
+      padding: 0.29rem 0.65rem;
+      border-radius: 0.32rem;
+      border: none;
+      cursor: pointer;
+      transition: background 0.16s, transform 0.13s;
+      outline: none;
+      box-shadow: 0 1px 8px #ff174422;
     }
-
-    .entry button:hover {
+    .entry button:hover, .entry button:focus {
       background: #b91c1c;
-      transform: translateY(0);
+      transform: scale(1.05);
     }
-
     .no-data {
       text-align: center;
-      color: #6b7280;
+      color: var(--text-sub);
       font-style: italic;
-      padding: 1rem;
+      font-size: 1.03em;
+      padding: 1.1rem 0 1.0rem 0;
+      letter-spacing: 0.01em;
+      user-select: none;
+      opacity: 0.88;
     }
-
     footer {
       text-align: center;
-      color: #4b5563;
-      font-size: 0.85rem;
-      margin: 1.5rem 0 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid #e5e7eb;
+      color: #6f7e95;
+      font-size: 0.96em;
+      margin: 1.1rem 0 0.27rem 0;
+      padding-top: 0.2rem;
+      border-top: 1px solid #23283a;
       width: 100%;
+      letter-spacing: 0.06em;
+      user-select: none;
     }
-
     @media (max-width: 600px) {
-      .input-group {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-      }
-
-      h1 {
-        font-size: 1.6rem;
-      }
-
-      .form-container, .summary, .history {
-        padding: 1rem;
-      }
-
-      button {
-        font-size: 0.9rem;
-      }
+      .container { max-width: 99vw; padding: 0.12rem; }
+      .form-container, .summary, .history { padding-left: 0.11rem; padding-right: 0.11rem; }
+      .summary { flex-direction: column; align-items: flex-start; gap: 0.36rem; }
+      .entry { font-size: 0.99rem; }
+      h1 { font-size: 1.18rem; }
+      .form-container { padding: 0.9rem 0.3rem 0.5rem 0.3rem; }
+    }
+    @media (min-width: 601px) and (max-width: 900px) {
+      .container { max-width: 90vw; }
+    }
+    @media (min-width: 901px) and (max-width: 1200px) {
+      .container { max-width: 60vw; }
+    }
+    @media (min-width: 1201px) {
+      .container { max-width: 430px; }
+    }
+    @media (max-width: 400px) {
+      .container { max-width: 100vw; }
+      .form-container, .summary, .history { padding-left: 0.03rem; padding-right: 0.03rem; }
+      h1 { font-size: 0.93rem; }
     }
   </style>
+  <!-- Storage shim for legacy browsers -->
+  <script>
+    // Storage fallback for legacy/unsupported environments
+    (function() {
+      try {
+        var testKey = '__storage_test__';
+        localStorage.setItem(testKey, testKey);
+        localStorage.removeItem(testKey);
+      } catch (e) {
+        window._fallbackStorage = {};
+        window.localStorage = {
+          getItem: function(key) { return window._fallbackStorage[key] || null; },
+          setItem: function(key, val) { window._fallbackStorage[key] = String(val); },
+          removeItem: function(key) { delete window._fallbackStorage[key]; }
+        };
+      }
+    })();
+  </script>
 </head>
 <body>
   <div class="container">
-    <h1>📊 Fadhil's Finance Tracker</h1>
-
+    <h1>🌐 Fadhil's Finance Tracker</h1>
     <div class="form-container">
-      <form id="financeForm">
-        <div class="input-group">
-          <input type="text" id="description" placeholder="Description (e.g., Food, Savings)" required />
-          <input type="number" id="amount" placeholder="Amount (e.g., 50000)" min="0" step="1" required />
+      <form id="financeForm" autocomplete="off" novalidate>
+        <div class="error-message" id="formError"></div>
+        <div class="input-row">
+          <input type="text" id="description" placeholder="Description" maxlength="24" required autocomplete="off" />
+          <input type="number" id="amount" placeholder="Amount" min="0" step="1" required autocomplete="off" />
+        </div>
+        <div class="input-row">
           <select id="type">
             <option value="income">Income</option>
             <option value="expense">Expense</option>
           </select>
           <input type="date" id="date" required />
         </div>
-        <button type="submit">➕ Add Transaction</button>
+        <button type="submit">Add</button>
       </form>
     </div>
-
     <div class="summary" id="summary"></div>
     <div class="history" id="history"></div>
   </div>
-
-  <footer>© 2025 Fadhil Akbar Cariearsa. All Rights Reserved.</footer>
-
+  <footer>© 2025 Fadhil Akbar Cariearsa</footer>
   <script>
-    const form = document.getElementById('financeForm');
-    const historyDiv = document.getElementById('history');
-    const summaryDiv = document.getElementById('summary');
-    let data = JSON.parse(localStorage.getItem('financeData')) || [];
+    // Universal compatibility: ES5+ and major browsers & search engines
+    (function() {
+      var form = document.getElementById('financeForm');
+      var historyDiv = document.getElementById('history');
+      var summaryDiv = document.getElementById('summary');
+      var errorDiv = document.getElementById('formError');
+      var data = [];
 
-    function formatCurrency(amount) {
-      return `IDR ${amount.toLocaleString('id-ID')}`;
-    }
-
-    function updateSummary() {
-      const totalIncome = data
-        .filter(item => item.type === 'income')
-        .reduce((sum, item) => sum + item.amount, 0);
-      const totalExpense = data
-        .filter(item => item.type === 'expense')
-        .reduce((sum, item) => sum + item.amount, 0);
-      const balance = totalIncome - totalExpense;
-
-      summaryDiv.innerHTML = `
-        <span class="income">Income: ${formatCurrency(totalIncome)}</span>
-        <span class="expense">Expense: ${formatCurrency(totalExpense)}</span>
-        <span>Balance: ${formatCurrency(balance)}</span>
-      `;
-    }
-
-    function updateDisplay() {
-      historyDiv.innerHTML = '';
-      if (data.length === 0) {
-        historyDiv.innerHTML = '<p class="no-data">No transactions yet.</p>';
-        return;
+      // Storage & logs combined: data[] is always in sync with localStorage as a unified log+store
+      function loadData() {
+        try {
+          var raw = localStorage.getItem('financeData');
+          data = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(data)) data = [];
+        } catch (e) {
+          data = [];
+          localStorage.removeItem('financeData');
+        }
+      }
+      function saveData() {
+        try {
+          localStorage.setItem('financeData', JSON.stringify(data));
+        } catch (e) {
+          showError("Storage error, changes not saved.");
+        }
       }
 
-      data.sort((a, b) => new Date(b.date) - new Date(a.date));
-      data.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = `entry ${item.type}`;
-        div.innerHTML = `
-          <div>
-            <strong>${item.description}</strong><br/>
-            ${formatCurrency(item.amount)} 
-            <span>(${item.type === 'income' ? 'Income' : 'Expense'})</span><br/>
-            <small>${new Date(item.date).toLocaleDateString('en-GB')}</small>
-          </div>
-          <button onclick="confirmDelete(${index})">🗑️ Delete</button>
-        `;
-        historyDiv.appendChild(div);
-      });
-      updateSummary();
-    }
+      function formatCurrency(amount) {
+        return 'IDR ' + Number(amount).toLocaleString('id-ID');
+      }
 
-    function confirmDelete(index) {
-      const entry = data[index];
-      if (confirm(`Delete "${entry.description}" of ${formatCurrency(entry.amount)} (${entry.type})?`)) {
-        data.splice(index, 1);
-        localStorage.setItem('financeData', JSON.stringify(data));
+      function showError(msg) {
+        errorDiv.textContent = msg;
+        errorDiv.style.display = 'block';
+        setTimeout(function() { errorDiv.style.display = 'none'; }, 2600);
+      }
+
+      function updateSummary() {
+        var totalIncome = 0, totalExpense = 0, i, item;
+        for (i = 0; i < data.length; i++) {
+          item = data[i];
+          if (item.type === 'income') totalIncome += item.amount;
+          else totalExpense += item.amount;
+        }
+        var balance = totalIncome - totalExpense;
+        summaryDiv.innerHTML =
+          '<span class="income">+' + formatCurrency(totalIncome) + '</span>' +
+          '<span class="expense">-' + formatCurrency(totalExpense) + '</span>' +
+          '<span class="balance">Balance: ' + formatCurrency(balance) + '</span>';
+      }
+
+      function updateDisplay() {
+        if (!Array.isArray(data) || !data.length) {
+          historyDiv.innerHTML = '<div class="no-data">No transactions.</div>';
+          updateSummary();
+          return;
+        }
+        data.sort(function(a, b) {
+          return new Date(b.date) - new Date(a.date);
+        });
+        var html = '<div class="log-list">';
+        for (var i = 0; i < data.length; i++) {
+          var item = data[i];
+          html +=
+            '<div class="entry ' + item.type + '" tabindex="0">' +
+              '<div class="desc">' +
+                '<strong title="' + item.description.replace(/"/g, '&quot;') + '">' + item.description.replace(/</g, '&lt;') + '</strong>' +
+                '<small>' + (item.date ? new Date(item.date).toLocaleDateString('en-GB') : 'No date') + '</small>' +
+              '</div>' +
+              '<div style="display:flex;align-items:center;">' +
+                '<span class="amt">' + (item.type === 'income' ? '+' : '-') + formatCurrency(item.amount) + '</span>' +
+                '<button title="Delete" type="button" aria-label="Delete ' + item.description.replace(/"/g, '&quot;') + '" onclick="confirmDelete(' + i + ')">🗑️</button>' +
+              '</div>' +
+            '</div>';
+        }
+        html += '</div>';
+        historyDiv.innerHTML = html;
+        updateSummary();
+      }
+
+      // Delete with confirmation, ARIA support
+      window.confirmDelete = function(index) {
+        if (!Array.isArray(data) || !data[index]) return;
+        var entry = data[index];
+        if (window.confirm('Delete "' + entry.description + '" of ' + formatCurrency(entry.amount) + ' (' + entry.type + ')?')) {
+          data.splice(index, 1);
+          saveData();
+          updateDisplay();
+        }
+      };
+
+      // Form validation & add
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var description = document.getElementById('description').value.trim();
+        var amount = document.getElementById('amount').value.trim();
+        var type = document.getElementById('type').value;
+        var date = document.getElementById('date').value;
+
+        if (!description) { showError('Description required.'); return; }
+        if (!amount || isNaN(amount) || Number(amount) < 0) { showError('Amount must be a non-negative number.'); return; }
+        if (!date) { showError('Date required.'); return; }
+        if (description.length > 24) { showError('Description too long.'); return; }
+        if (!(type === 'income' || type === 'expense')) { showError('Invalid transaction type.'); return; }
+
+        var amountNum = Math.round(Number(amount));
+        if (!isFinite(amountNum) || amountNum < 0) { showError('Invalid amount.'); return; }
+
+        data.push({ description: description, amount: amountNum, type: type, date: date });
+        saveData();
+        form.reset();
+        document.getElementById('date').value = new Date().toISOString().slice(0,10);
         updateDisplay();
-      }
-    }
+      });
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const description = document.getElementById('description').value.trim();
-      const amount = parseInt(document.getElementById('amount').value);
-      const type = document.getElementById('type').value;
-      const date = document.getElementById('date').value;
+      // Autofill today's date for speed
+      document.getElementById('date').value = new Date().toISOString().slice(0,10);
 
-      if (!description || isNaN(amount) || amount < 0 || !date) {
-        alert('Please fill all fields correctly!');
-        return;
-      }
+      // Keyboard accessibility: delete with 'Delete' key on entry
+      historyDiv.addEventListener('keydown', function(e) {
+        if (e.key === 'Delete' && document.activeElement.classList.contains('entry')) {
+          var entries = Array.prototype.slice.call(historyDiv.querySelectorAll('.entry'));
+          var idx = entries.indexOf(document.activeElement);
+          if (idx >= 0) window.confirmDelete(idx);
+        }
+      });
 
-      data.push({ description, amount, type, date });
-      localStorage.setItem('financeData', JSON.stringify(data));
-      form.reset();
+      // Search engine browser compatibility: no special API used; all modern search engines and browsers supported
+
+      // On load
+      loadData();
       updateDisplay();
-    });
-
-    updateDisplay();
+    })();
   </script>
 </body>
 </html>
