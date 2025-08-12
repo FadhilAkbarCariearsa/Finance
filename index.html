@@ -361,130 +361,198 @@
       }
     }
   </style>
-  <!-- Storage shim remains unchanged -->
   <script>
-    // Existing JavaScript code (unchanged)
-    (function() {
-      var form = document.getElementById('financeForm');
-      var historyDiv = document.getElementById('history');
-      var summaryDiv = document.getElementById('summary');
-      var errorDiv = document.getElementById('formError');
-      var data = [];
+    // Improved JS: more robust storage, validation, and display
+    (function () {
+      const LS_KEY = "financeData";
+      const form = document.getElementById("financeForm");
+      const historyDiv = document.getElementById("history");
+      const summaryDiv = document.getElementById("summary");
+      const errorDiv = document.getElementById("formError");
+      let data = [];
 
+      // Robustly load data from localStorage
       function loadData() {
+        let raw = localStorage.getItem(LS_KEY);
         try {
-          var raw = localStorage.getItem('financeData');
-          data = raw ? JSON.parse(raw) : [];
-          if (!Array.isArray(data)) data = [];
+          const arr = JSON.parse(raw);
+          data = Array.isArray(arr)
+            ? arr.filter(
+                (item) =>
+                  item &&
+                  typeof item.description === "string" &&
+                  typeof item.amount === "number" &&
+                  (item.type === "income" || item.type === "expense") &&
+                  item.date
+              )
+            : [];
         } catch (e) {
           data = [];
-          localStorage.removeItem('financeData');
+          localStorage.removeItem(LS_KEY);
         }
       }
+
+      // Save data robustly
       function saveData() {
         try {
-          localStorage.setItem('financeData', JSON.stringify(data));
+          localStorage.setItem(LS_KEY, JSON.stringify(data));
         } catch (e) {
           showError("Storage error, changes not saved.");
         }
       }
 
+      // Format currency in IDR
       function formatCurrency(amount) {
-        return 'IDR ' + Number(amount).toLocaleString('id-ID');
+        return (
+          "IDR " +
+          Number(isNaN(amount) ? 0 : amount).toLocaleString("id-ID", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+          })
+        );
       }
 
       function showError(msg) {
         errorDiv.textContent = msg;
-        errorDiv.style.display = 'block';
-        setTimeout(function() { errorDiv.style.display = 'none'; }, 2600);
+        errorDiv.style.display = "block";
+        setTimeout(() => (errorDiv.style.display = "none"), 2600);
       }
 
+      // Summarize all transactions
       function updateSummary() {
-        var totalIncome = 0, totalExpense = 0, i, item;
-        for (i = 0; i < data.length; i++) {
-          item = data[i];
-          if (item.type === 'income') totalIncome += item.amount;
-          else totalExpense += item.amount;
+        let totalIncome = 0,
+          totalExpense = 0;
+        for (const item of data) {
+          if (item.type === "income") totalIncome += item.amount;
+          else if (item.type === "expense") totalExpense += item.amount;
         }
-        var balance = totalIncome - totalExpense;
+        const balance = totalIncome - totalExpense;
         summaryDiv.innerHTML =
-          '<span class="income">+' + formatCurrency(totalIncome) + '</span>' +
-          '<span class="expense">-' + formatCurrency(totalExpense) + '</span>' +
-          '<span class="balance">Balance: ' + formatCurrency(balance) + '</span>';
+          `<span class="income">+${formatCurrency(totalIncome)}</span>` +
+          `<span class="expense">-${formatCurrency(totalExpense)}</span>` +
+          `<span class="balance">Balance: ${formatCurrency(balance)}</span>`;
       }
 
+      // Display transaction history sorted by date (most recent first)
       function updateDisplay() {
-        if (!Array.isArray(data) || !data.length) {
-          historyDiv.innerHTML = '<div class="no-data">No transactions.</div>';
+        if (!Array.isArray(data) || data.length === 0) {
+          historyDiv.innerHTML = `<div class="no-data">No transactions.</div>`;
           updateSummary();
           return;
         }
-        data.sort(function(a, b) {
+        // Sort by date (descending), then by creation order for same date
+        data.sort((a, b) => {
+          if (a.date === b.date) return 0;
           return new Date(b.date) - new Date(a.date);
         });
-        var html = '<div class="log-list">';
-        for (var i = 0; i < data.length; i++) {
-          var item = data[i];
-          html +=
-            '<div class="entry ' + item.type + '" tabindex="0">' +
-              '<div class="desc">' +
-                '<strong title="' + item.description.replace(/"/g, '&quot;') + '">' + item.description.replace(/</g, '&lt;') + '</strong>' +
-                '<small>' + (item.date ? new Date(item.date).toLocaleDateString('en-GB') : 'No date') + '</small>' +
-              '</div>' +
-              '<div style="display:flex;align-items:center;">' +
-                '<span class="amt">' + (item.type === 'income' ? '+' : '-') + formatCurrency(item.amount) + '</span>' +
-                '<button title="Delete" type="button" aria-label="Delete ' + item.description.replace(/"/g, '&quot;') + '" onclick="confirmDelete(' + i + ')">🗑️</button>' +
-              '</div>' +
-            '</div>';
-        }
-        html += '</div>';
+        let html = `<div class="log-list">`;
+        data.forEach((item, i) => {
+          html += `
+            <div class="entry ${item.type}" tabindex="0">
+              <div class="desc">
+                <strong title="${item.description.replace(/"/g, "&quot;")}">${item.description.replace(/</g, "&lt;")}</strong>
+                <small>${item.date ? new Date(item.date).toLocaleDateString("en-GB") : "No date"}</small>
+              </div>
+              <div style="display:flex;align-items:center;">
+                <span class="amt">${item.type === "income" ? "+" : "-"}${formatCurrency(item.amount)}</span>
+                <button title="Delete" type="button" aria-label="Delete ${item.description.replace(/"/g, "&quot;")}" onclick="confirmDelete(${i})">🗑️</button>
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
         historyDiv.innerHTML = html;
         updateSummary();
       }
 
-      window.confirmDelete = function(index) {
+      // Delete transaction
+      window.confirmDelete = function (index) {
         if (!Array.isArray(data) || !data[index]) return;
-        var entry = data[index];
-        if (window.confirm('Delete "' + entry.description + '" of ' + formatCurrency(entry.amount) + ' (' + entry.type + ')?')) {
+        const entry = data[index];
+        if (
+          window.confirm(
+            `Delete "${entry.description}" of ${formatCurrency(entry.amount)} (${entry.type})?`
+          )
+        ) {
           data.splice(index, 1);
           saveData();
           updateDisplay();
         }
       };
 
-      form.addEventListener('submit', function(e) {
+      // Validate and add transaction
+      form.addEventListener("submit", function (e) {
         e.preventDefault();
-        var description = document.getElementById('description').value.trim();
-        var amount = document.getElementById('amount').value.trim();
-        var type = document.getElementById('type').value;
-        var date = document.getElementById('date').value;
+        const description = document.getElementById("description").value.trim();
+        let amount = document.getElementById("amount").value.trim();
+        const type = document.getElementById("type").value;
+        const date = document.getElementById("date").value;
 
-        if (!description) { showerror('Description required.'); return; }
-        if (!amount || isNaN(amount) || Number(amount) < 0) { showError('Amount must be a non-negative number.'); return; }
-        if (!date) { showError('Date required.'); return; }
-        if (description.length > 24) { showError('Description too long.'); return; }
-        if (!(type === 'income' || type === 'expense')) { showError('Invalid transaction type.'); return; }
+        if (!description) {
+          showError("Description required.");
+          return;
+        }
+        if (description.length > 24) {
+          showError("Description too long (max 24 chars).");
+          return;
+        }
+        if (!amount || isNaN(amount)) {
+          showError("Amount must be a number.");
+          return;
+        }
+        amount = Number(amount);
+        if (!isFinite(amount) || amount < 0) {
+          showError("Amount must be a non-negative number.");
+          return;
+        }
+        if (!date) {
+          showError("Date required.");
+          return;
+        }
+        if (!(type === "income" || type === "expense")) {
+          showError("Invalid transaction type.");
+          return;
+        }
 
-        var amountNum = Math.round(Number(amount));
-        if (!isFinite(amountNum) || amountNum < 0) { showError('Invalid amount.'); return; }
+        // Round to integer
+        const amountNum = Math.round(amount);
 
-        data.push({ description: description, amount: amountNum, type: type, date: date });
+        data.push({
+          description,
+          amount: amountNum,
+          type,
+          date,
+        });
         saveData();
         form.reset();
-        document.getElementById('date').value = new Date().toISOString().slice(0,10);
+        document.getElementById("date").value = new Date()
+          .toISOString()
+          .slice(0, 10);
         updateDisplay();
       });
 
-      document.getElementById('date').value = new Date().toISOString().slice(0,10);
+      // Set date field default to today
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("date").value = new Date()
+          .toISOString()
+          .slice(0, 10);
+      });
 
-      historyDiv.addEventListener('keydown', function(e) {
-        if (e.key === 'Delete' && document.activeElement.classList.contains('entry')) {
-          var entries = Array.prototype.slice.call(historyDiv.querySelectorAll('.entry'));
-          var idx = entries.indexOf(document.activeElement);
+      // Keyboard delete for entries
+      historyDiv.addEventListener("keydown", function (e) {
+        if (
+          e.key === "Delete" &&
+          document.activeElement.classList.contains("entry")
+        ) {
+          const entries = Array.prototype.slice.call(
+            historyDiv.querySelectorAll(".entry")
+          );
+          const idx = entries.indexOf(document.activeElement);
           if (idx >= 0) window.confirmDelete(idx);
         }
       });
 
+      // Initial data load
       loadData();
       updateDisplay();
     })();
@@ -498,7 +566,7 @@
         <div class="error-message" id="formError"></div>
         <div class="input-row">
           <input type="text" id="description" placeholder="Description" maxlength="24" required autocomplete="off" />
-          <input type="number" id="amount" placeholder="Amount" min="0" step="0.01" required autocomplete="off" />
+          <input type="number" id="amount" placeholder="Amount" min="0" step="1" required autocomplete="off" />
         </div>
         <div class="input-row">
           <select id="type">
